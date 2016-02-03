@@ -1,7 +1,10 @@
 package com.ne3x7.tardisparallaxlwp;
 
+import android.graphics.Color;
 import android.service.wallpaper.WallpaperService;
 import android.view.SurfaceHolder;
+
+import com.nvanbenschoten.motion.ParallaxImageView;
 
 public class WPService extends WallpaperService{
 
@@ -14,9 +17,15 @@ public class WPService extends WallpaperService{
 
         private int width;
         private int height;
-
+        private ParallaxImageView img;
         public WPEngine() {
-
+            img = new ParallaxImageView(getApplicationContext());
+            img.setBackgroundColor(Color.BLUE);
+            img.setMinimumWidth(100);
+            img.setMinimumHeight(100);
+            img.registerSensorManager();
+            width = img.getWidth();
+            height = img.getHeight();
         }
 
         @Override
@@ -29,6 +38,7 @@ public class WPService extends WallpaperService{
         @Override
         public void onSurfaceDestroyed(SurfaceHolder holder) {
             super.onSurfaceDestroyed(holder);
+            img.unregisterSensorManager();
         }
 
         @Override
