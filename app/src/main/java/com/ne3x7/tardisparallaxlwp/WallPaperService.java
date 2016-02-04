@@ -6,8 +6,7 @@ import android.view.SurfaceHolder;
 
 import com.nvanbenschoten.motion.ParallaxImageView;
 
-public class WPService extends WallpaperService{
-
+public class WallPaperService extends WallpaperService {
     @Override
     public Engine onCreateEngine() {
         return new WPEngine();
@@ -20,7 +19,7 @@ public class WPService extends WallpaperService{
         private ParallaxImageView img;
         public WPEngine() {
             img = new ParallaxImageView(getApplicationContext());
-            img.setBackgroundColor(Color.WHITE);
+            img.setBackgroundColor(Color.BLUE);
             img.setMinimumWidth(100);
             img.setMinimumHeight(100);
             img.registerSensorManager();

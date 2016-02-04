@@ -1,10 +1,11 @@
 package com.ne3x7.tardisparallaxlwp;
 
+import android.annotation.TargetApi;
 import android.app.WallpaperManager;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -31,15 +32,16 @@ public class Main extends AppCompatActivity implements AdapterView.OnItemClickLi
         preferences.setOnItemClickListener(this);
     }
 
-
+    @TargetApi(16)
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         switch (position) {
             case 0:
-                Intent setWP = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
-                setWP.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(this, WPService.class));
+                Intent setWP = new Intent();
+                setWP.setAction(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
+                setWP.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
+                        new ComponentName(this, WallPaperService.class));
                 startActivity(setWP);
-                break;
         }
     }
 }
