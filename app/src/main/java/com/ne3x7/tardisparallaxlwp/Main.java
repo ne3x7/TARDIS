@@ -43,14 +43,14 @@ public class Main extends AppCompatActivity implements View.OnClickListener {
     protected void onPause() {
         super.onPause();
 
-        view.registerSensorManager();
+        view.unregisterSensorManager();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        view.unregisterSensorManager();
+        view.registerSensorManager();
     }
 
     @Override
