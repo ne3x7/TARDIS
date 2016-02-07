@@ -9,6 +9,9 @@ import android.view.SurfaceHolder;
 
 import com.nvanbenschoten.motion.ParallaxImageView;
 
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+
 public class WallPaperService extends WallpaperService {
     @Override
     public Engine onCreateEngine() {
@@ -16,6 +19,29 @@ public class WallPaperService extends WallpaperService {
     }
 
     private class WPEngine extends Engine {
+
+        private final Handler handler = new Handler() {
+            @Override
+            public void close() {
+
+            }
+
+            @Override
+            public void flush() {
+
+            }
+
+            @Override
+            public void publish(LogRecord record) {
+
+            }
+        };
+        private final Runnable thread = new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        };
 
         private int width;
         private int height;
@@ -35,9 +61,6 @@ public class WallPaperService extends WallpaperService {
         public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             super.onSurfaceChanged(holder, format, width, height);
 
-            //this.width = width;
-            //this.height = height;
-
             Canvas c = holder.lockCanvas();
             img.layout(0, 0, this.width, this.height);
             img.setImageBitmap(BitmapFactory.decodeStream(getResources().
@@ -53,21 +76,13 @@ public class WallPaperService extends WallpaperService {
         @Override
         public void onSurfaceDestroyed(SurfaceHolder holder) {
             super.onSurfaceDestroyed(holder);
-            // TODO
             img.unregisterSensorManager();
         }
 
         @Override
         public void onVisibilityChanged(boolean visible) {
             super.onVisibilityChanged(visible);
-            // TODO
-            if (visible) {
-                this.visible = true;
-                //img.registerSensorManager();
-            } else {
-                this.visible = false;
-               // img.unregisterSensorManager();
-            }
+            this.visible = visible;
         }
     }
 }
