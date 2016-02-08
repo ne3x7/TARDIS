@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Handler;
 import android.service.wallpaper.WallpaperService;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
 import com.nvanbenschoten.motion.ParallaxImageView;
@@ -22,13 +23,14 @@ public class WallPaperService extends WallpaperService {
         private int height;
         private Paint paint = new Paint();
         private ParallaxImageView img;
+        private final String TAG = "PERSONAL DEBUG DATA";
         private boolean visible = false;
 
         // Instance of class Handler that the queue of processes, used to start the Runnable object
         // and to make it call itself indefinitely.
         private final Handler handler = new Handler();
 
-        // A thread (or not thread?) object, the only purpose - start a new thread that will redraw
+        // A to-be-thread object, the only purpose - start a new thread that will redraw
         // the wallpaper all the time. Probably makes the program super inefficient.
         private final Runnable loadRunner = new Runnable() {
             @Override
@@ -43,8 +45,11 @@ public class WallPaperService extends WallpaperService {
             }
         };
 
+        /*
+        Constructor for Engine
+         */
         public WPEngine() {
-            // Initializing and setting up the parallax image.
+            Log.d(TAG, "Initializing Engine");
             img = new ParallaxImageView(getApplicationContext());
             img.setParallaxIntensity(2.5f);
             img.registerSensorManager();
@@ -52,37 +57,51 @@ public class WallPaperService extends WallpaperService {
         }
 
         /**
-         * Draws the wallpaper image on the wallpaper canvas.
+         * Draws the wallpaper image on the wallpaper canvas
+         * No log here because it's an infinite loop
          */
         private void draw(){
-            // Debugging comment
-            System.out.println("Drawing image");
-
-            // TODO Scale the image, so it has the dimensions of the device screen.
+            Canvas c = null;
             SurfaceHolder surfaceHolder = getSurfaceHolder();
-            Canvas c = surfaceHolder.lockCanvas();
-            img.layout(0, 0, c.getWidth(), c.getHeight());
-            img.setImageBitmap(BitmapFactory.decodeStream(getResources().
-                    openRawResource(R.raw.large)));
-            // Creating bitmap with specified width, height and configuration. The last argument
-            // is configuration, it just specifies drawing method to use when creating Bitmap.
-            Bitmap b = Bitmap.createBitmap(c.getHeight(), c.getWidth(), Bitmap.Config.ARGB_8888);
 
-            // I don`t know what these 2 lines do.
-            Canvas canvas = new Canvas(b);
-            img.draw(canvas);
+            try {
+                // Get canvas
+                c = surfaceHolder.lockCanvas();
 
-            c.drawBitmap(b, 0, 0, paint);
+                // Get screen params
+                // TODO It failed once, investigate why
+                if (c != null) {
+                    width = c.getWidth();
+                    height = c.getHeight();
+                }
 
-            // TODO figure out why it throws exceptions.
-            // For some reason, sometimes the program executes this line when canvas is already
-            // released and some other exception may occur.
+                // Apply screen params to parallax image view
+                img.layout(0, 0, width, height);
+                img.setImageBitmap(BitmapFactory.decodeStream(getResources().
+                        openRawResource(R.raw.large)));
+
+                // Create bitmap with specified width, height and configuration. The last argument
+                // specifies drawing method to use when creating Bitmap, ARGB_8888 uses color black
+                // instead of transparent
+                Bitmap b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+                // Get the image canvas and draw it
+                Canvas canvas = new Canvas(b);
+                img.draw(canvas);
+
+                // Draw Bitmap on canvas
+                if (c != null) {
+                    c.drawBitmap(b, 0, 0, paint);
+                }
+            } catch (NullPointerException e) {
+                Log.d(TAG, "Canvas or bitmap do not exist", e);
+            }
+
             try {
                 surfaceHolder.unlockCanvasAndPost(c);
             }
-            catch(Exception e){
-                // Just do nothing. At least for now.
-                System.err.println(e.getMessage());
+            catch(IllegalStateException e){
+                Log.d(TAG, "Surface destroyed, but thread is still running", e);
             }
         }
 
@@ -95,29 +114,36 @@ public class WallPaperService extends WallpaperService {
 
         @Override
         public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            Log.d(TAG, "SurfaceChanged");
             this.width = width;
             this.height = height;
             super.onSurfaceChanged(holder, format, this.width, this.height);
             draw();
+            // TODO Why don't we removeCallbacks?
         }
 
         @Override
         public void onSurfaceDestroyed(SurfaceHolder holder) {
+            Log.d(TAG, "SurfaceDestroyed");
+
             super.onSurfaceDestroyed(holder);
-            // TODO
+
+            handler.removeCallbacks(loadRunner);
+
             img.unregisterSensorManager();
         }
 
         @Override
         public void onVisibilityChanged(boolean visible) {
+            Log.d(TAG, "VisibilityChanged from " + this.visible + " to " + visible);
             super.onVisibilityChanged(visible);
-            // TODO
             if (visible) {
                 this.visible = true;
                 img.registerSensorManager();
                 handler.post(loadRunner);
             } else {
                 this.visible = false;
+                handler.removeCallbacks(loadRunner);
                 img.unregisterSensorManager();
             }
         }
