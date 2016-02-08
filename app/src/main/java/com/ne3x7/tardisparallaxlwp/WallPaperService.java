@@ -27,26 +27,28 @@ public class WallPaperService extends WallpaperService {
         // Instance of class Handler that the queue of processes, used to start the Runnable object
         // and to make it call itself indefinitely.
         private final Handler handler = new Handler();
+
         // A thread (or not thread?) object, the only purpose - start a new thread that will redraw
         // the wallpaper all the time. Probably makes the program super inefficient.
         private final Runnable loadRunner = new Runnable() {
             @Override
             public void run() {
-                Thread d = new Thread(new Runnable() {
+                Thread draw_thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
                         refreshDraw();
                     }
                 });
-                d.start();
+                draw_thread.start();
             }
         };
+
         public WPEngine() {
             // Initializing and setting up the parallax image.
-            handler.post(loadRunner);
             img = new ParallaxImageView(getApplicationContext());
             img.setParallaxIntensity(2.5f);
             img.registerSensorManager();
+            handler.post(loadRunner);
         }
 
         /**
@@ -55,17 +57,18 @@ public class WallPaperService extends WallpaperService {
         private void draw(){
             // Debugging comment
             System.out.println("Drawing image");
+
             // TODO Scale the image, so it has the dimensions of the device screen.
             SurfaceHolder surfaceHolder = getSurfaceHolder();
             Canvas c = surfaceHolder.lockCanvas();
-            img.layout(0, 0, c.getHeight(), c.getWidth());
+            img.layout(0, 0, c.getWidth(), c.getHeight());
             img.setImageBitmap(BitmapFactory.decodeStream(getResources().
                     openRawResource(R.raw.large)));
             // Creating bitmap with specified width, height and configuration. The last argument
-            // is configuration, it just specifies what method to use when creating Bitmap.
+            // is configuration, it just specifies drawing method to use when creating Bitmap.
             Bitmap b = Bitmap.createBitmap(c.getHeight(), c.getWidth(), Bitmap.Config.ARGB_8888);
 
-            // I don`t know these 2 lines do.
+            // I don`t know what these 2 lines do.
             Canvas canvas = new Canvas(b);
             img.draw(canvas);
 
@@ -79,6 +82,7 @@ public class WallPaperService extends WallpaperService {
             }
             catch(Exception e){
                 // Just do nothing. At least for now.
+                System.err.println(e.getMessage());
             }
         }
 
@@ -93,7 +97,7 @@ public class WallPaperService extends WallpaperService {
         public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             this.width = width;
             this.height = height;
-            super.onSurfaceChanged(holder, format, width, height);
+            super.onSurfaceChanged(holder, format, this.width, this.height);
             draw();
         }
 
