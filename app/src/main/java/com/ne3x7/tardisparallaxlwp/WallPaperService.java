@@ -4,13 +4,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.os.Handler;
 import android.service.wallpaper.WallpaperService;
 import android.view.SurfaceHolder;
 
 import com.nvanbenschoten.motion.ParallaxImageView;
-
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 
 public class WallPaperService extends WallpaperService {
     @Override
@@ -20,69 +18,108 @@ public class WallPaperService extends WallpaperService {
 
     private class WPEngine extends Engine {
 
-        private final Handler handler = new Handler() {
-            @Override
-            public void close() {
-
-            }
-
-            @Override
-            public void flush() {
-
-            }
-
-            @Override
-            public void publish(LogRecord record) {
-
-            }
-        };
-        private final Runnable thread = new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        };
-
         private int width;
         private int height;
         private Paint paint = new Paint();
         private ParallaxImageView img;
         private boolean visible = false;
+
+        // Instance of class Handler that the queue of processes, used to start the Runnable object
+        // and to make it call itself indefinitely.
+        private final Handler handler = new Handler();
+
+        // A thread (or not thread?) object, the only purpose - start a new thread that will redraw
+        // the wallpaper all the time. Probably makes the program super inefficient.
+        private final Runnable loadRunner = new Runnable() {
+            @Override
+            public void run() {
+                Thread draw_thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        refreshDraw();
+                    }
+                });
+                draw_thread.start();
+            }
+        };
+
         public WPEngine() {
+            // Initializing and setting up the parallax image.
             img = new ParallaxImageView(getApplicationContext());
             img.setParallaxIntensity(2.5f);
             img.registerSensorManager();
+            handler.post(loadRunner);
+        }
 
-            this.width = img.getWidth();
-            this.height = img.getHeight();
+        /**
+         * Draws the wallpaper image on the wallpaper canvas.
+         */
+        private void draw(){
+            // Debugging comment
+            System.out.println("Drawing image");
+
+            // TODO Scale the image, so it has the dimensions of the device screen.
+            SurfaceHolder surfaceHolder = getSurfaceHolder();
+            Canvas c = surfaceHolder.lockCanvas();
+            img.layout(0, 0, c.getWidth(), c.getHeight());
+            img.setImageBitmap(BitmapFactory.decodeStream(getResources().
+                    openRawResource(R.raw.large)));
+            // Creating bitmap with specified width, height and configuration. The last argument
+            // is configuration, it just specifies drawing method to use when creating Bitmap.
+            Bitmap b = Bitmap.createBitmap(c.getHeight(), c.getWidth(), Bitmap.Config.ARGB_8888);
+
+            // I don`t know what these 2 lines do.
+            Canvas canvas = new Canvas(b);
+            img.draw(canvas);
+
+            c.drawBitmap(b, 0, 0, paint);
+
+            // TODO figure out why it throws exceptions.
+            // For some reason, sometimes the program executes this line when canvas is already
+            // released and some other exception may occur.
+            try {
+                surfaceHolder.unlockCanvasAndPost(c);
+            }
+            catch(Exception e){
+                // Just do nothing. At least for now.
+                System.err.println(e.getMessage());
+            }
+        }
+
+        private void refreshDraw(){
+            draw();
+            handler.removeCallbacks(loadRunner);
+            if(visible)
+                handler.post(loadRunner);
         }
 
         @Override
         public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-            super.onSurfaceChanged(holder, format, width, height);
-
-            Canvas c = holder.lockCanvas();
-            img.layout(0, 0, this.width, this.height);
-            img.setImageBitmap(BitmapFactory.decodeStream(getResources().
-                    openRawResource(R.raw.large)));
-
-            Bitmap b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888); // магия
-            Canvas canvas = new Canvas(b); // магия 2
-            img.draw(canvas);
-            c.drawBitmap(b, 0, 0, paint);
-            holder.unlockCanvasAndPost(c);
+            this.width = width;
+            this.height = height;
+            super.onSurfaceChanged(holder, format, this.width, this.height);
+            draw();
         }
 
         @Override
         public void onSurfaceDestroyed(SurfaceHolder holder) {
             super.onSurfaceDestroyed(holder);
+            // TODO
             img.unregisterSensorManager();
         }
 
         @Override
         public void onVisibilityChanged(boolean visible) {
             super.onVisibilityChanged(visible);
-            this.visible = visible;
+            // TODO
+            if (visible) {
+                this.visible = true;
+                img.registerSensorManager();
+                handler.post(loadRunner);
+            } else {
+                this.visible = false;
+                img.unregisterSensorManager();
+            }
         }
     }
 }
