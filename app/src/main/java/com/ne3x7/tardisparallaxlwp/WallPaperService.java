@@ -1,6 +1,5 @@
 package com.ne3x7.tardisparallaxlwp;
 
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -35,19 +34,20 @@ public class WallPaperService extends WallpaperService {
         private final Runnable loadRunner = new Runnable() {
             @Override
             public void run() {
-                Thread draw_thread = new Thread(new Runnable() {
+                final Thread draw_thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
                         refreshDraw();
                     }
                 });
+                draw_thread.setPriority(Thread.MAX_PRIORITY);
                 draw_thread.start();
             }
         };
 
-        /*
+        /**
         Constructor for Engine
-         */
+         **/
         public WPEngine() {
             Log.d(TAG, "Initializing Engine");
             img = new ParallaxImageView(getApplicationContext());
@@ -79,20 +79,19 @@ public class WallPaperService extends WallpaperService {
                 img.layout(0, 0, width, height);
                 img.setImageBitmap(BitmapFactory.decodeStream(getResources().
                         openRawResource(R.raw.large)));
-
                 // Create bitmap with specified width, height and configuration. The last argument
                 // specifies drawing method to use when creating Bitmap, ARGB_8888 uses color black
                 // instead of transparent
-                Bitmap b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                /*Bitmap b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
                 // Get the image canvas and draw it
-                Canvas canvas = new Canvas(b);
-                img.draw(canvas);
+                Canvas canvas = new Canvas(b);*/
+                img.draw(c);
 
                 // Draw Bitmap on canvas
-                if (c != null) {
+                /*if (c != null) {
                     c.drawBitmap(b, 0, 0, paint);
-                }
+                }*/
             } catch (NullPointerException e) {
                 Log.d(TAG, "Canvas or bitmap do not exist", e);
             }
@@ -110,6 +109,7 @@ public class WallPaperService extends WallpaperService {
             handler.removeCallbacks(loadRunner);
             if(visible)
                 handler.post(loadRunner);
+                //handler.postAtFrontOfQueue(loadRunner);
         }
 
         @Override
@@ -119,7 +119,7 @@ public class WallPaperService extends WallpaperService {
             this.height = height;
             super.onSurfaceChanged(holder, format, this.width, this.height);
             draw();
-            // TODO Why don't we removeCallbacks?
+            handler.removeCallbacks(loadRunner);
         }
 
         @Override
