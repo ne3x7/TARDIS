@@ -50,14 +50,33 @@ public class WallPaperService extends WallpaperService {
          **/
         public WPEngine() {
             Log.d(TAG, "Initializing Engine");
+
             img = new ParallaxImageView(getApplicationContext());
-            img.setParallaxIntensity(2.0f);
-            img.setTiltSensitivity(1.5f);
+            img.setParallaxIntensity(1.75f);
+            img.setTiltSensitivity(1.25f);
             img.setScaledIntensities(true);
             img.registerSensorManager();
             img.setImageBitmap(BitmapFactory.decodeStream(getResources().
                     openRawResource(R.raw.large)));
+
             handler.post(loadRunner);
+        }
+
+        @Override
+        public void onSurfaceCreated(SurfaceHolder surfaceHolder) {
+            super.onSurfaceCreated(surfaceHolder);
+
+            // Get screen params
+            Canvas c = surfaceHolder.lockCanvas();
+            if (c != null) {
+                width = c.getWidth();
+                height = c.getHeight();
+            }
+
+            // Apply screen params to parallax image view
+            img.layout(0, 0, width, height);
+
+            surfaceHolder.unlockCanvasAndPost(c);
         }
 
         /**
@@ -72,15 +91,6 @@ public class WallPaperService extends WallpaperService {
                 // Get canvas
                 c = surfaceHolder.lockCanvas();
 
-                // Get screen params
-                // TODO It failed once, investigate why
-                if (c != null) {
-                    width = c.getWidth();
-                    height = c.getHeight();
-                }
-
-                // Apply screen params to parallax image view
-                img.layout(0, 0, width, height);
                 // Draw the image on its canvas.
                 img.draw(c);
             } catch (NullPointerException e) {
