@@ -2,7 +2,6 @@ package com.ne3x7.tardisparallaxlwp;
 
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.os.Handler;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
@@ -20,7 +19,6 @@ public class WallPaperService extends WallpaperService {
 
         private int width;
         private int height;
-        private Paint paint = new Paint();
         private ParallaxImageView img;
         private final String TAG = "PERSONAL DEBUG DATA";
         private boolean visible = false;
@@ -46,12 +44,16 @@ public class WallPaperService extends WallpaperService {
         };
 
         /**
-        Constructor for Engine
+         * Constructor for Engine
+         * Initializes the parallax image and its parameters,
+         * starts the process of refreshing the image.
          **/
         public WPEngine() {
             Log.d(TAG, "Initializing Engine");
             img = new ParallaxImageView(getApplicationContext());
-            img.setParallaxIntensity(2.5f);
+            img.setParallaxIntensity(2.0f);
+            img.setTiltSensitivity(1.5f);
+            img.setScaledIntensities(true);
             img.registerSensorManager();
             img.setImageBitmap(BitmapFactory.decodeStream(getResources().
                     openRawResource(R.raw.large)));
@@ -62,7 +64,7 @@ public class WallPaperService extends WallpaperService {
          * Draws the wallpaper image on the wallpaper canvas
          * No log here because it's an infinite loop
          */
-        private void draw(){
+        private void draw() {
             Canvas c = null;
             SurfaceHolder surfaceHolder = getSurfaceHolder();
 
@@ -87,16 +89,15 @@ public class WallPaperService extends WallpaperService {
 
             try {
                 surfaceHolder.unlockCanvasAndPost(c);
-            }
-            catch(IllegalStateException e){
+            } catch (IllegalStateException e) {
                 Log.d(TAG, "Surface destroyed, but thread is still running", e);
             }
         }
 
-        private void refreshDraw(){
+        private void refreshDraw() {
             draw();
             handler.removeCallbacks(loadRunner);
-            if(visible)
+            if (visible)
                 handler.post(loadRunner);
         }
 
@@ -115,9 +116,7 @@ public class WallPaperService extends WallpaperService {
             Log.d(TAG, "SurfaceDestroyed");
 
             super.onSurfaceDestroyed(holder);
-
             handler.removeCallbacks(loadRunner);
-
             img.unregisterSensorManager();
         }
 
