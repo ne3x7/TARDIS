@@ -53,6 +53,8 @@ public class WallPaperService extends WallpaperService {
             img = new ParallaxImageView(getApplicationContext());
             img.setParallaxIntensity(2.5f);
             img.registerSensorManager();
+            img.setImageBitmap(BitmapFactory.decodeStream(getResources().
+                    openRawResource(R.raw.large)));
             handler.post(loadRunner);
         }
 
@@ -77,21 +79,8 @@ public class WallPaperService extends WallpaperService {
 
                 // Apply screen params to parallax image view
                 img.layout(0, 0, width, height);
-                img.setImageBitmap(BitmapFactory.decodeStream(getResources().
-                        openRawResource(R.raw.large)));
-                // Create bitmap with specified width, height and configuration. The last argument
-                // specifies drawing method to use when creating Bitmap, ARGB_8888 uses color black
-                // instead of transparent
-                /*Bitmap b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-
-                // Get the image canvas and draw it
-                Canvas canvas = new Canvas(b);*/
+                // Draw the image on its canvas.
                 img.draw(c);
-
-                // Draw Bitmap on canvas
-                /*if (c != null) {
-                    c.drawBitmap(b, 0, 0, paint);
-                }*/
             } catch (NullPointerException e) {
                 Log.d(TAG, "Canvas or bitmap do not exist", e);
             }
@@ -109,7 +98,6 @@ public class WallPaperService extends WallpaperService {
             handler.removeCallbacks(loadRunner);
             if(visible)
                 handler.post(loadRunner);
-                //handler.postAtFrontOfQueue(loadRunner);
         }
 
         @Override
