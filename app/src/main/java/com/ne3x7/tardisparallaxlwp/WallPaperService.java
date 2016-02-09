@@ -52,7 +52,7 @@ public class WallPaperService extends WallpaperService {
             Log.d(TAG, "Initializing Engine");
 
             img = new ParallaxImageView(getApplicationContext());
-            img.setParallaxIntensity(1.75f);
+            img.setParallaxIntensity(1.1f);
             img.setTiltSensitivity(1.25f);
             img.setScaledIntensities(true);
             img.registerSensorManager();
