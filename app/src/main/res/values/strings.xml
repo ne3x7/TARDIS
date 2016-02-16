@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">TARDIS Parallax LWP</string>
+    <string name="enable">Enable</string>
+    <string name="btn">Set wallpaper</string>
 </resources>
