@@ -1,5 +1,6 @@
 package com.ne3x7.tardisparallaxlwp;
 
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.os.Handler;
@@ -15,10 +16,11 @@ public class WallPaperService extends WallpaperService {
         return new WPEngine();
     }
 
-    private class WPEngine extends Engine {
+    private class WPEngine extends Engine implements SharedPreferences.OnSharedPreferenceChangeListener {
 
         private int width;
         private int height;
+        private float intensity = 1.1f;
         private ParallaxImageView img;
         private final String TAG = "PERSONAL DEBUG DATA";
         private boolean visible = false;
@@ -52,7 +54,7 @@ public class WallPaperService extends WallpaperService {
             Log.d(TAG, "Initializing Engine");
 
             img = new ParallaxImageView(getApplicationContext());
-            img.setParallaxIntensity(1.1f);
+            img.setParallaxIntensity(intensity);
             img.setTiltSensitivity(1.25f);
             img.setScaledIntensities(true);
             img.registerSensorManager();
@@ -142,6 +144,13 @@ public class WallPaperService extends WallpaperService {
                 this.visible = false;
                 handler.removeCallbacks(loadRunner);
                 img.unregisterSensorManager();
+            }
+        }
+
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            if (SettingsActivity.SEEK_BAR_KEY.equals(key)) {
+                intensity = sharedPreferences.getFloat(SettingsActivity.SEEK_BAR_KEY, 1.1f);
             }
         }
     }

@@ -4,3 +4,5 @@
     android:label="LiveWallpaper"
     android:thumbnail="@raw/large">
 </wallpaper>
+
+    <!--- Insert android:settingsActivity="com.ne3x7.tardisparallaxlwp.SettingsActivity" when ready-->
