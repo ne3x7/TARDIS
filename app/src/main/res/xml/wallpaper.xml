@@ -3,5 +3,5 @@
     android:id="@+id/image_wallpaper"
     android:label="LiveWallpaper"
     android:thumbnail="@raw/large"
-    android:settingsActivity="com.ne3x7.tardisparallaxlwp.SettingsActivity">
+    android:settingsActivity="com.ne3x7.tardisparallaxlwp.SettingsActivity"> <!-- It tells the Wallpaper Picker to use our Settings -->
 </wallpaper>

@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -152,8 +153,17 @@ public class WallPaperService extends WallpaperService {
             }
         }
 
+        /**
+         * This method is not called. Move it to SettingsActivity and make it burn the changes. Also
+         * insert the commented code to onPause() method of PreferenceFragment. Should work then.
+         */
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            Log.d(TAG, "SharedPreferenceChanged: key = " + key + ", new value in percent = " + sharedPreferences.getInt(SEEK_BAR_KEY, 0));
+            /*
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+            pref.registerOnSharedPreferenceChangeListener(this);
+             */
             if (SEEK_BAR_KEY.equals(key))
                 intensity = 1.1f + (sharedPreferences.getInt(SEEK_BAR_KEY, 0) * delta);
         }

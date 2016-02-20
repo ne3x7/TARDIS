@@ -10,16 +10,12 @@ public class SettingsActivity extends PreferenceActivity {
     private static final String TAG = "PERSONAL DEBUG DATA";
 
     /**
-     * Connects a layout to the Activity and sets a listener
+     * Calls the fragment - it's the only way to avoid deprecated Activity-method addPreferencesFromResource
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
-            getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
-        } catch (Exception e) {
-            Log.d(TAG, "Exception occured in onCreate", e);
-        }
+        getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
     }
 
     public static class MyPreferenceFragment extends PreferenceFragment
@@ -28,11 +24,7 @@ public class SettingsActivity extends PreferenceActivity {
         public void onCreate(final Bundle savedInstanceState)
         {
             super.onCreate(savedInstanceState);
-            try {
-                addPreferencesFromResource(R.xml.pref);
-            } catch (Exception e) {
-                Log.d(TAG, "Exception occured in fragment", e);
-            }
+            addPreferencesFromResource(R.xml.pref);
         }
     }
 }

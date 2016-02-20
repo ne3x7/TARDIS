@@ -16,6 +16,9 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
     private int current;
     private int max;
 
+    /**
+     * Constructor gets max & current values from xml, because why not
+     */
     public SeekBarPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
 
@@ -27,8 +30,10 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
     protected View onCreateView(ViewGroup parent) {
         super.onCreateView(parent);
 
+        // That's how you avoid dynamic layout programming
         RelativeLayout layout = (RelativeLayout) LayoutInflater.from(getContext()).inflate(R.layout.seek_bar_preference_layout, null);
 
+        // This may be hardcoded straight in xml
         TextView title = (TextView) layout.findViewById(R.id.title);
         title.setText(getTitle());
 
@@ -38,15 +43,19 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
         sb.setOnSeekBarChangeListener(this);
 
         tv = (TextView) layout.findViewById(R.id.value);
-        tv.setText(current+""); // почему?
+        tv.setText(String.format("%d", current) + "%");
 
         return layout;
     }
 
+    /**
+     * Now the value is not changing all the time, only on release. But it can be changed by
+     * inserting some code into this method.
+     */
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        tv.setText(progress+"");
-        tv.invalidate(); // что это?
+        tv.setText(String.format("%d", progress) + "%");
+        tv.invalidate();
     }
 
     @Override
