@@ -1,12 +1,13 @@
 package com.ne3x7.tardisparallaxlwp;
 
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceFragment;
+import android.util.Log;
 
-public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener {
-    public static final String SEEK_BAR_KEY = "seekBarKey";
-    private Preference sbp;
+public class SettingsActivity extends PreferenceActivity {
+
+    private static final String TAG = "PERSONAL DEBUG DATA";
 
     /**
      * Connects a layout to the Activity and sets a listener
@@ -14,22 +15,24 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.pref);
-        sbp = findPreference(SEEK_BAR_KEY);
-        sbp.setOnPreferenceChangeListener(this);
+        try {
+            getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
+        } catch (Exception e) {
+            Log.d(TAG, "Exception occured in onCreate", e);
+        }
     }
 
-    /**
-     * Listener
-     */
-    @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue) {
-        if (SettingsActivity.SEEK_BAR_KEY.equals(preference.getKey())) {
-            int val = (Integer) newValue;
+    public static class MyPreferenceFragment extends PreferenceFragment
+    {
+        @Override
+        public void onCreate(final Bundle savedInstanceState)
+        {
+            super.onCreate(savedInstanceState);
+            try {
+                addPreferencesFromResource(R.xml.pref);
+            } catch (Exception e) {
+                Log.d(TAG, "Exception occured in fragment", e);
+            }
         }
-
-        // TODO What does it do?
-
-        return false;
     }
 }

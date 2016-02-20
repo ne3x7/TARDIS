@@ -23,7 +23,12 @@ public class WallPaperService extends WallpaperService {
         private float intensity = 1.1f;
         private ParallaxImageView img;
         private final String TAG = "PERSONAL DEBUG DATA";
+        private static final String SEEK_BAR_KEY = "intensity";
+        private static final float min = 1.1f;
+        private static final float max = 2.5f;
+        private static final float delta = (max - min) / 100.0f;
         private boolean visible = false;
+        // SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
 
         // Instance of class Handler that the queue of processes, used to start the Runnable object
         // and to make it call itself indefinitely.
@@ -149,9 +154,8 @@ public class WallPaperService extends WallpaperService {
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (SettingsActivity.SEEK_BAR_KEY.equals(key)) {
-                intensity = sharedPreferences.getFloat(SettingsActivity.SEEK_BAR_KEY, 1.1f);
-            }
+            if (SEEK_BAR_KEY.equals(key))
+                intensity = 1.1f + (sharedPreferences.getInt(SEEK_BAR_KEY, 0) * delta);
         }
     }
 }

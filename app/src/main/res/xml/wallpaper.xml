@@ -2,7 +2,6 @@
 <wallpaper xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/image_wallpaper"
     android:label="LiveWallpaper"
-    android:thumbnail="@raw/large">
+    android:thumbnail="@raw/large"
+    android:settingsActivity="com.ne3x7.tardisparallaxlwp.SettingsActivity">
 </wallpaper>
-
-    <!--- Insert android:settingsActivity="com.ne3x7.tardisparallaxlwp.SettingsActivity" when ready-->

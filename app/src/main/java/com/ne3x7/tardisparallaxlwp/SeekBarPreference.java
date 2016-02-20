@@ -2,104 +2,51 @@ package com.ne3x7.tardisparallaxlwp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.TypedArray;
 import android.preference.Preference;
 import android.util.AttributeSet;
-import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarChangeListener {
-    private static final int maximum = 100;
-    private static final int interval = 1;
-
-    private TextView percentage;
-    private float current = 45.0f;
-
-    public SeekBarPreference(Context context) {
-        super(context);
-    }
-
-    public SeekBarPreference(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
+    private TextView tv;
+    private int current;
+    private int max;
 
     public SeekBarPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        max = attrs.getAttributeIntValue("http://schemas.android.com/apk/res-auto", "max", 100);
+        current = attrs.getAttributeIntValue("http://schemas.android.com/apk/res-auto", "current", 0);
     }
 
-    /**
-     * Dynamically creates preference layout. Some problems might occur with placement, can't be
-     * seen until it at least starts, what it doesn't do. Maybe it's be easier to create a layout
-     * using xml, but I don't know how to insert it here. findViewById() maybe?
-     */
     @Override
     protected View onCreateView(ViewGroup parent) {
         super.onCreateView(parent);
 
-        LinearLayout layout = new LinearLayout(getContext());
+        RelativeLayout layout = (RelativeLayout) LayoutInflater.from(getContext()).inflate(R.layout.seek_bar_preference_layout, null);
 
-        LinearLayout.LayoutParams params_wrap = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params_wrap.gravity = Gravity.CENTER_HORIZONTAL;
+        TextView title = (TextView) layout.findViewById(R.id.title);
+        title.setText(getTitle());
 
-        LinearLayout.LayoutParams params_match = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params_match.gravity = Gravity.CENTER_HORIZONTAL;
+        SeekBar sb = (SeekBar) layout.findViewById(R.id.sb);
+        sb.setMax(max);
+        sb.setProgress(current);
+        sb.setOnSeekBarChangeListener(this);
 
-        layout.setPadding(10, 5, 10, 5);
-        layout.setOrientation(LinearLayout.HORIZONTAL);
-
-        TextView text = new TextView(getContext());
-        text.setText(getTitle());
-        text.setLayoutParams(params_wrap);
-
-        SeekBar seek = new SeekBar(getContext());
-        seek.setMax(maximum);
-        seek.setProgress((int) current);
-        seek.setLayoutParams(params_match);
-        seek.setOnSeekBarChangeListener(this);
-
-        percentage = new TextView(getContext());
-        percentage.setText(seek.getProgress());
-
-        layout.addView(text);
-        layout.addView(seek);
-        layout.addView(percentage);
-        layout.setId(R.id.sbp);
+        tv = (TextView) layout.findViewById(R.id.value);
+        tv.setText(current+""); // почему?
 
         return layout;
     }
 
-    /**
-     * Changes the value of @current, which will be sent to TextView, and updates the preference
-     */
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        progress = Math.round(((float)progress)/interval)*interval;
-
-        if(!callChangeListener(progress)){
-            seekBar.setProgress((int)current);
-            return;
-        }
-
-        seekBar.setProgress(progress);
-        current = progress;
-        percentage.setText(progress);
-        updatePreference(progress);
-
-        notifyChanged();
-    }
-
-    /**
-     * Puts the desired @val into some SharedPreference
-     */
-    private void updatePreference(int val) {
-        // TODO Clean the mess with ints and floats all over the project
-        SharedPreferences.Editor editor = getEditor();
-        editor.putInt(getKey(), val);
-        editor.commit();
+        tv.setText(progress+"");
+        tv.invalidate(); // что это?
     }
 
     @Override
@@ -109,47 +56,14 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
-        // Do nothing
+        current = seekBar.getProgress();
+        update(current);
+        notifyChanged();
     }
 
-    /**
-     * It was in the example
-     */
-    @Override
-    protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
-        // TODO What is going on here and why?
-        super.onSetInitialValue(restorePersistedValue, defaultValue);
-        int temp = restorePersistedValue ? getPersistedInt(45) : (Integer)defaultValue;
-
-        if(!restorePersistedValue)
-            persistInt(temp);
-
-        current = temp;
-    }
-
-    /**
-     * It was in the example
-     */
-    @Override
-    protected Object onGetDefaultValue(TypedArray a, int index) {
-        // TODO What is going on here and why?
-        super.onGetDefaultValue(a, index);
-        int val = (int) a.getInt(index, 45);
-
-        return validate(val);
-    }
-
-    /**
-     * It was in the example and is used in onGetDefaultValue
-     */
-    private int validate(int value) {
-        if(value > maximum)
-            value = maximum;
-        else if(value < 0)
-            value = 0;
-        else if(value % interval != 0)
-            value = Math.round(((float)value)/interval)*interval;
-
-        return value;
+    private void update(int val) {
+        SharedPreferences.Editor ed = getEditor();
+        ed.putInt(getKey(), val);
+        ed.commit();
     }
 }

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:attr="http://schemas.android.com/apk/res-auto">
     <com.ne3x7.tardisparallaxlwp.SeekBarPreference
-        android:key="intensity"
-        android:defaultValue="45"
-        android:title="Parallax Intensity">
+        android:key="@string/inten"
+        android:title="@string/preftitle"
+        attr:max="100"
+        attr:current="0">
     </com.ne3x7.tardisparallaxlwp.SeekBarPreference>
 </PreferenceScreen>

@@ -34,7 +34,7 @@ public class Main extends AppCompatActivity implements View.OnClickListener {
         img = BitmapFactory.decodeStream(is);
 
         view.setImageBitmap(img);
-        view.setParallaxIntensity(2.5f);
+        view.setParallaxIntensity(1.1f);
 
         btn.setOnClickListener(this);
     }
