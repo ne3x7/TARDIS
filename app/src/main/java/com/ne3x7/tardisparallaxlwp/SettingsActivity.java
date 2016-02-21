@@ -7,7 +7,7 @@ import android.preference.PreferenceFragment;
 public class SettingsActivity extends Activity {
 
     private static final String TAG = "PERSONAL DEBUG DATA";
-    public static final String SEEK_BAR_KEY = "intensity";
+    public static final String INTENSITY_KEY = "intensity", TILT_KEY = "tilt";
     /**
      * Calls the fragment - it's the only way to avoid deprecated Activity-method addPreferencesFromResource
      */

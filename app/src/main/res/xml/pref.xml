@@ -4,8 +4,16 @@
     android:title="@string/settings_main_category"
     >
     <com.ne3x7.tardisparallaxlwp.SeekBarPreference
-        android:key="@string/inten"
-        android:title="@string/preftitle"
+        android:key="@string/intensity"
+        android:title="@string/pref_intensity_title"
+        attr:max="100"
+        attr:current="0"
+        android:defaultValue="25"
+        >
+    </com.ne3x7.tardisparallaxlwp.SeekBarPreference>
+    <com.ne3x7.tardisparallaxlwp.SeekBarPreference
+        android:key="@string/tilt"
+        android:title="@string/pref_tilt_title"
         attr:max="100"
         attr:current="0"
         android:defaultValue="25"

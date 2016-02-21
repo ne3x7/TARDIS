@@ -28,7 +28,6 @@ public class WallPaperService extends WallpaperService {
         private static final float max = 2.5f;
         private static final float delta = (max - min) / 100.0f;
         private boolean visible = false;
-        // SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
 
         // Instance of class Handler that the queue of processes, used to start the Runnable object
         // and to make it call itself indefinitely.
@@ -169,14 +168,23 @@ public class WallPaperService extends WallpaperService {
                     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
                                                           String key) {
                         Log.d(TAG, "Preference Changed");
-                        if (SettingsActivity.SEEK_BAR_KEY.equals(key)) {
-                            Log.d(TAG, "SharedPreferenceChanged: key = " + key +
-                                    ", new value in percent = " +
-                                    sharedPreferences.getInt(SettingsActivity.SEEK_BAR_KEY, 0));
-                            intensity = 1.1f +
-                                    (sharedPreferences.getInt(SettingsActivity.SEEK_BAR_KEY, 0)
-                                    * delta);
-                            img.setParallaxIntensity(intensity);
+                        switch(key) {
+                            case SettingsActivity.INTENSITY_KEY: {
+                                Log.d(TAG, "SharedPreferenceChanged: key = " + key +
+                                        ", new value in percent = " +
+                                        sharedPreferences.getInt(SettingsActivity.INTENSITY_KEY, 0));
+                                intensity = 1.1f +
+                                        (sharedPreferences.getInt(SettingsActivity.INTENSITY_KEY, 0)
+                                                * delta);
+                                img.setParallaxIntensity(intensity);
+                            }
+                            case SettingsActivity.TILT_KEY: {
+                                Log.d(TAG, "SharedPreferenceChanged: key = " + key +
+                                        ", new value in percent = " +
+                                        sharedPreferences.getInt(SettingsActivity.TILT_KEY, 0));
+                                img.setTiltSensitivity(1.0f +
+                                        sharedPreferences.getInt(SettingsActivity.TILT_KEY, 0)/100f);
+                            }
                         }
                     }
                 };

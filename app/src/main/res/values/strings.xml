@@ -2,7 +2,9 @@
     <string name="app_name">TARDIS Parallax LWP</string>
     <string name="enable">Enable</string>
     <string name="btn">Set wallpaper</string>
-    <string name="inten">intensity</string>
-    <string name="preftitle">Parallax Intensity:</string>
+    <string name="intensity">intensity</string>
+    <string name="tilt">tilt</string>
+    <string name="pref_intensity_title">Parallax Intensity:</string>
+    <string name="pref_tilt_title">Tilt Sensitivity:</string>
     <string name="settings_main_category">Settings Control</string>
 </resources>
