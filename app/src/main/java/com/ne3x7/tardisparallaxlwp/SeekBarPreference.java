@@ -1,9 +1,10 @@
 package com.ne3x7.tardisparallaxlwp;
 
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.preference.Preference;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,15 +16,18 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
     private TextView tv;
     private int current;
     private int max;
+    private final String TAG = "PERSONAL DEBUG DATA";
+    public final int DEFAULT_VALUE = 25;
 
     /**
      * Constructor gets max & current values from xml, because why not
      */
     public SeekBarPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
-
+        Log.d(TAG, "Calling constructor");
         max = attrs.getAttributeIntValue("http://schemas.android.com/apk/res-auto", "max", 100);
-        current = attrs.getAttributeIntValue("http://schemas.android.com/apk/res-auto", "current", 0);
+        current = attrs.getAttributeIntValue("http://schemas.android.com/apk/res-auto", "current",
+                DEFAULT_VALUE);
     }
 
     @Override
@@ -31,7 +35,8 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
         super.onCreateView(parent);
 
         // That's how you avoid dynamic layout programming
-        RelativeLayout layout = (RelativeLayout) LayoutInflater.from(getContext()).inflate(R.layout.seek_bar_preference_layout, null);
+        RelativeLayout layout = (RelativeLayout) LayoutInflater.from(getContext()).
+                inflate(R.layout.seek_bar_preference_layout, null);
 
         // This may be hardcoded straight in xml
         TextView title = (TextView) layout.findViewById(R.id.title);
@@ -46,6 +51,33 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
         tv.setText(String.format("%d", current) + "%");
 
         return layout;
+    }
+
+    /**
+     * Sets the initial value of the seekbar progress.
+     * Sets the progress to the saved value, or to the default, if there is no saved value.
+     * @param restorePersistedValue boolean, true if there is a saved value, false otherwise.
+     * @param defaultValue Integer, the default value from xml file pref.xml.
+     */
+    @Override
+    protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
+        if(restorePersistedValue){
+            // restores the seekbar value from its SharedPreferences.
+            current = this.getPersistedInt(DEFAULT_VALUE);
+        }else{
+            current = (Integer) defaultValue;
+            persistInt(current);
+        }
+        Log.d(TAG, Integer.toString(current));
+    }
+
+    /*
+        Method that must be implemented in order to set current to defaultValue in onSetInitialValue.
+        returns the default value from xml file or DEFAULT_VALUE, if the value is not defined in xml.
+     */
+    @Override
+    protected Object onGetDefaultValue(TypedArray a, int index) {
+        return a.getInteger(index, DEFAULT_VALUE);
     }
 
     /**
@@ -71,8 +103,8 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
     }
 
     private void update(int val) {
-        SharedPreferences.Editor ed = getEditor();
-        ed.putInt(getKey(), val);
-        ed.commit();
+        // Saving value to this preference`s SharedPreferences
+        persistInt(val);
+        Log.d(TAG, "Stored: " + val);
     }
 }
