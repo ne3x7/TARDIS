@@ -4,4 +4,5 @@
     <string name="btn">Set wallpaper</string>
     <string name="inten">intensity</string>
     <string name="preftitle">Parallax Intensity:</string>
+    <string name="settings_main_category">Settings Control</string>
 </resources>

@@ -24,7 +24,6 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
      */
     public SeekBarPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
-        Log.d(TAG, "Calling constructor");
         max = attrs.getAttributeIntValue("http://schemas.android.com/apk/res-auto", "max", 100);
         current = attrs.getAttributeIntValue("http://schemas.android.com/apk/res-auto", "current",
                 DEFAULT_VALUE);
@@ -68,7 +67,6 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
             current = (Integer) defaultValue;
             persistInt(current);
         }
-        Log.d(TAG, Integer.toString(current));
     }
 
     /*

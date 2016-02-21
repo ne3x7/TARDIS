@@ -1,13 +1,13 @@
 package com.ne3x7.tardisparallaxlwp;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends Activity {
 
     private static final String TAG = "PERSONAL DEBUG DATA";
-
+    public static final String SEEK_BAR_KEY = "intensity";
     /**
      * Calls the fragment - it's the only way to avoid deprecated Activity-method addPreferencesFromResource
      */
@@ -24,6 +24,8 @@ public class SettingsActivity extends PreferenceActivity {
         public void onCreate(final Bundle savedInstanceState)
         {
             super.onCreate(savedInstanceState);
+
+            // Load preferences from an xml resource
             addPreferencesFromResource(R.xml.pref);
         }
     }

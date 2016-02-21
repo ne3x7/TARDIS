@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:attr="http://schemas.android.com/apk/res-auto">
+    xmlns:attr="http://schemas.android.com/apk/res-auto"
+    android:title="@string/settings_main_category"
+    >
     <com.ne3x7.tardisparallaxlwp.SeekBarPreference
         android:key="@string/inten"
         android:title="@string/preftitle"

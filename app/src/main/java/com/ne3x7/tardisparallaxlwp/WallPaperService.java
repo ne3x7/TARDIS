@@ -1,8 +1,10 @@
 package com.ne3x7.tardisparallaxlwp;
 
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -15,7 +17,7 @@ public class WallPaperService extends WallpaperService {
         return new WPEngine();
     }
 
-    private class WPEngine extends Engine {
+    public class WPEngine extends Engine{
 
         private int width;
         private int height;
@@ -64,13 +66,16 @@ public class WallPaperService extends WallpaperService {
             img.setImageBitmap(BitmapFactory.decodeStream(getResources().
                     openRawResource(R.raw.large)));
 
+            // registering a shared preference change listener.
+            SharedPreferences preferences = PreferenceManager.
+                    getDefaultSharedPreferences(getApplicationContext());
+            preferences.registerOnSharedPreferenceChangeListener(prefListener);
             handler.post(loadRunner);
         }
 
         @Override
         public void onSurfaceCreated(SurfaceHolder surfaceHolder) {
             super.onSurfaceCreated(surfaceHolder);
-
             // Get screen params
             Canvas c = surfaceHolder.lockCanvas();
             if (c != null) {
@@ -133,6 +138,11 @@ public class WallPaperService extends WallpaperService {
             super.onSurfaceDestroyed(holder);
             handler.removeCallbacks(loadRunner);
             img.unregisterSensorManager();
+
+            // unregistering a shared preference change listener.
+            SharedPreferences preferences = PreferenceManager.
+                    getDefaultSharedPreferences(getApplicationContext());
+            preferences.unregisterOnSharedPreferenceChangeListener(prefListener);
         }
 
         @Override
@@ -151,23 +161,24 @@ public class WallPaperService extends WallpaperService {
         }
 
         /**
-         * This method is not called. Move it to SettingsActivity and make it burn the changes. Also
-         * insert the commented code to onPause() method of PreferenceFragment. Should work then.
+         * This is a listener that gets called every time the application shared preferences
+         * are changed. Right now it changes parallax intensity, later will extend functionality.
          */
-        /*@Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-
-            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-            pref.registerOnSharedPreferenceChangeListener(this);
-
-            Log.d(TAG, "Preference Changed");
-            if (SeekBarPreference.SEEK_BAR_KEY.equals(key)) {
-                Log.d(TAG, "SharedPreferenceChanged: key = " + key + ", new value in percent = " +
-                        sharedPreferences.getInt(SeekBarPreference.SEEK_BAR_KEY, 0));
-                intensity = 1.1f + (sharedPreferences.getInt(SeekBarPreference.SEEK_BAR_KEY, 0)
-                        * delta);
-                img.setParallaxIntensity(intensity);
-            }
-        }*/
+        public SharedPreferences.OnSharedPreferenceChangeListener prefListener =
+                new SharedPreferences.OnSharedPreferenceChangeListener() {
+                    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+                                                          String key) {
+                        Log.d(TAG, "Preference Changed");
+                        if (SettingsActivity.SEEK_BAR_KEY.equals(key)) {
+                            Log.d(TAG, "SharedPreferenceChanged: key = " + key +
+                                    ", new value in percent = " +
+                                    sharedPreferences.getInt(SettingsActivity.SEEK_BAR_KEY, 0));
+                            intensity = 1.1f +
+                                    (sharedPreferences.getInt(SettingsActivity.SEEK_BAR_KEY, 0)
+                                    * delta);
+                            img.setParallaxIntensity(intensity);
+                        }
+                    }
+                };
     }
 }
